@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block main-content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <h3 class="section-title text-center mb-5">Past Events</h3>
+      {% for event in past_events %}
+      <div class="card mb-4 shadow">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <!-- Add image or any other visual representation of the event -->
+            <img src="{{ event.organizer_image.url }}" class="img-fluid rounded-start" alt="{{ event.name }}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ event.Event_Name }}</h5>
+              <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
+              <p class="card-text"><strong>Time:</strong> {{ event.time }}</p>
+              <p class="card-text"><strong>Venue:</strong> {{ event.venue }}</p>
+              <p class="card-text"><strong>By:</strong> <a href="{{ event.speaker.get_absolute_url }}">{{ event.speaker }}</a>, {{ event.organizer }}</p>
+              <p class="card-text">{{ event.description }}</p>
+              <!-- You can add additional functionality or buttons here if needed -->
+                <div class="feedback-section">
+                          <button type="button" class="btn btn-primary btn-sm mt-2" data-toggle="modal" data-target="#feedbackModal{{ event.id }}">
+                            Comments
+                          </button>
+                          <div class="modal fade" id="feedbackModal{{ event.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="feedbackModalLabel">Feedbacks for {{ event.name }}</h5>
+
+                                </div>
+                                <div class="modal-body">
+                                  <ul class="list-group">
+                                    {% for feedback in event.feedbacks.all %}
+                                      <li class="list-group-item">{{ "@" }}{{ feedback.participant.user.username }}: {{ feedback.comment }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="alert alert-info" role="alert">
+        No past events found.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

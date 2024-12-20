@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Profile
+{% endblock title %}
+
+{% block main-content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 ">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="card-title mb-0">Welcome, {{ user.username }}</h1>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Here you can view and manage your profile information.</p>
+                    <!-- You can display more user information here -->
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary mr-2">Edit Profile</a>
+                        <a href="{% url 'app:organizer_logout' %}" class="btn btn-outline-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if user.is_authenticated and  user.organizer %}
+    <div class="row mt-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="card-title mb-0">Create Event</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">If you want to create an event, click the button below:</p>
+                    <div class="text-center">
+                        <a href="{% url 'app:CreateEvent' %}" class="btn btn-success">Create Event</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.is_authenticated and not user.organizer %}
+        <div class="row mt-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="card-title mb-0">Register Event</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">If you want to Register an event, click the button below:</p>
+                    <div class="text-center">
+                        <a href="{% url 'app:Eventlist' %}" class="btn btn-success">Register Event</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+
+    <br>
+    <br>
+</div>
+{% endblock %}

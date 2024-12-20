@@ -1,0 +1,35 @@
+<!-- event_detail.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>{{ event.name }}</h2>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <p><strong>Date:</strong> {{ event.date }}</p>
+        <p><strong>Time:</strong> {{ event.time }}</p>
+        <p><strong>Description:</strong> {{ event.description }}</p>
+      </div>
+      <div class="col-md-4">
+        <img src="{{ event.organizer_image.url }}" alt="{{ event.name }}" class="img-fluid">
+        <p><strong>Organizer:</strong> {{ event.organizer }}</p>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h3>Registration</h3>
+        {% if user.is_authenticated %}
+          <form method="POST" action="{% url 'app:event_register' event.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+        {% else %}
+          <p>Please <a href="{% url 'app:login' %}">login</a> to register for this event.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

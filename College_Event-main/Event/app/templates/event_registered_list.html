@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block main-content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <h3 class="section-title text-center mb-5">Registered Events</h3>
+      {% for event in registered_events %}
+      <div class="card mb-4 shadow">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{ event.organizer_image.url }}" class="img-fluid rounded-start" alt="{{ event.name }}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ event.name }}</h5>
+              <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
+              <p class="card-text"><strong>Time:</strong> {{ event.time }}</p>
+              <p class="card-text"><strong>Venue:</strong> {{ event.venue }}</p>
+              <!-- Add more details as needed -->
+              <p class="card-text"><strong>By:</strong> <a href="{{ event.speaker.get_absolute_url }}">{{ event.speaker }}</a>, {{ event.organizer }}</p>
+              <p class="card-text">{{ event.description }}</p>
+              {% if not event.feedback_given %}
+                <a href="{% url 'app:submit_feedback' event_id=event.id %}" class="btn btn-primary">Give Feedback</a>
+              {% else %}
+                <p class="alert alert-warning mb-3">Feedback has already been given for this event.</p>
+                <a href="{% url 'app:submit_feedback' event_id=event.id %}" class="btn btn-primary">Want to Update Feedback</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="alert alert-info" role="alert">
+        No registered events found.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

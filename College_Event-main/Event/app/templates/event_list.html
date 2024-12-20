@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block main-content %}
+<section class="section event-schedule">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <h3 class="section-title text-center mb-5">Event Schedule</h3>
+        <ul class="nav nav-tabs bg-dark rounded">
+          {% for day, events in events_by_day.items %}
+          <li class="nav-item {% if forloop.first %}active{% endif %}">
+            <a class="nav-link" href="#{{ day }}" data-toggle="tab">{{ day|title }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+        <br>
+        <br>
+        <div class="tab-content">
+          {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+          {% endif %}
+          {% for day, events in events_by_day.items %}
+          <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ day }}">
+            <div class="event-items">
+              {% for event in events %}
+              <div class="event-item">
+                <div class="card mb-3">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img class="img-fluid rounded shadow-sm" src="{{ event.organizer_image.url }}" alt="Profile Picture">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ event.name }}</h5>
+                        <p class="card-text"><small class="text-muted">Time: {{ event.time }}</small></p>
+                        <p class="card-text">Venue: {{ event.venue }}</p>
+                        <p class="card-text">By <a href="{{ event.speaker.get_absolute_url }}">{{ event.speaker }}</a>, {{ event.organizer }}</p>
+                        <p class="card-text">{{ event.description }}</p>
+
+                        {% if user.is_authenticated and not user.organizer %}
+                          {% if event.is_registered %}
+                            <p class="alert alert-warning mb-3">You are already registered for this event.</p>
+                          {% else %}
+                            <form action="{% url 'app:event_register' event.id %}" method="post">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-primary">Register</button>
+                            </form>
+                          {% endif %}
+                        {% else %}
+                            {% if user.is_authenticated and not user.organizer %}
+                              <p>Please <a href="{% url 'app:login' %}">login</a> to register for this event.</p>
+                            {% endif %}
+                        {% endif %}
+
+              <button type="button" class="btn btn-success btn-sm mt-2" onclick="predictFeedback({{ event.id }})">Predict Feedback</button>
+
+                        
+                        <div class="feedback-section">
+                          <button type="button" class="btn btn-primary btn-sm mt-2" data-toggle="modal" data-target="#feedbackModal{{ event.id }}">
+                            Comments
+                          </button>
+                          <div class="modal fade" id="feedbackModal{{ event.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="feedbackModalLabel">Feedbacks for {{ event.name }}</h5>
+
+                                </div>
+                                <div class="modal-body">
+                                  <ul class="list-group">
+                                    {% for feedback in event.feedbacks.all %}
+                                      <li class="list-group-item">{{ "@" }}{{ feedback.participant.user.username }}: {{ feedback.comment }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <br>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Activate the first tab by default
+    $('.nav-tabs a:first').tab('show');
+
+    // Change active tab on click
+    $('.nav-tabs a').on('click', function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+  });
+
+  function predictFeedback(eventId) {
+    // Make an AJAX request to predict feedback
+    $.ajax({
+      {% comment %} url: "{% url 'app:feedback_predict' %}",  // Update this with the correct URL {% endcomment %}
+      type: "POST",
+      data: {
+        event_id: eventId,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        // Display the predicted feedback or handle it as needed
+        alert('Predicted feedback: ' + response.feedback_prediction);
+      },
+      error: function(xhr, status, error) {
+        // Handle error
+        console.error(error);
+      }
+    });
+  }
+
+</script>
+{% endblock %}
